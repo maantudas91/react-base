@@ -1,0 +1,26 @@
+@import url('https://fonts.googleapis.com/css?family=Rancho');
+
+@import "node_modules/bootstrap/scss/bootstrap";
+
+body{
+    position: relative;
+    min-height: 100%;
+    font-family: 'Rancho', cursive;
+}
+
+#root{
+    
+    min-height: 100vh;
+    position: relative;
+}
+
+footer {
+    position: absolute;
+    width: 100%;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 1rem;
+    background-color: #efefef;
+    text-align: center;
+  }
