@@ -4,12 +4,16 @@ import { login } from '../services/UserService';
 import LoginForm from '../components/LoginForm';
 import ErrorMsg from '../components/ErrorMsg';
 import SucMsg from '../components/SucMsg';
+import { connect } from 'react-redux';
+import { loginSuccess } from '../rdx/actions/AuthActions';
+import { Route, Redirect } from 'react-router-dom'
+
 
 class Login extends Component {
 
     constructor(props){
         super(props);
-        console.log(this.props.match);
+        console.log(this.props);
         this.state = { canSubmit: false,  loginError: null, loginSuc:null  };
         this.submit = this.submit.bind(this);
         this.enableButton = this.enableButton.bind(this);
@@ -30,7 +34,15 @@ class Login extends Component {
 
     submit(model) {
         login(model.email, model.password)
-                .then( res => console.log(res))
+                .then( res => { 
+                    this.props.dispatch(loginSuccess(res));
+                    const {location} = this.props;
+                    if(location.state && location.state.from) {
+                        this.props.history.push(location.state.from);
+                    } else {
+                        this.props.history.push('/');
+                    }
+                })
                 .catch( err => this.setState(this.setErrorMsg(err)));
     }
 
@@ -51,7 +63,15 @@ class Login extends Component {
 
     render() {
         const {loginError, loginSuc } = this.state;
+        const {user, location} = this.props;
         return (
+            
+                (user.isLoggedin && location.state && location.state.from)
+                    ? <Redirect  push to={location.state.from}
+            /> : (user.isLoggedin) 
+                ? 
+                <Redirect  push to="/" />
+            :
             <div className="row justify-content-center">
                 <div className="col-md-6">
                     <div className="card">
@@ -73,11 +93,19 @@ class Login extends Component {
                                 disableButton ={this.disableButton}
                             />
                         </div>
+                        
                     </div>
                 </div>
             </div>
+            
         );
     }
 }
 
-export default withRouter(Login);
+const mapStateToProps = (state) => {
+    return { 
+        user: state.auth,
+        location: state.router.location
+    };
+};
+export default withRouter(connect(mapStateToProps)(Login));
